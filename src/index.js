@@ -1,32 +1,28 @@
 'use strict';
 
-function Collection(collection) {
-  if (collection !== undefined && !Array.isArray(collection) && typeof collection !== 'object') {
-    this.items = [collection];
-  } else if (collection instanceof this.constructor) {
-    this.items = collection.all();
-  } else {
-    this.items = collection || [];
+class Collection extends Array {
+  constructor(collection) {
+    let items;
+
+    if (collection !== undefined && !Array.isArray(collection)) {
+      items = [collection];
+    } else {
+      items = collection || [];
+    }
+
+    super(...items);
+  }
+
+  set items(collection) {
+    const deleteCount = this.length;
+
+    this.splice(0, deleteCount, ...collection);
+  }
+
+  get items() {
+    return [...this];
   }
 }
-
-/**
- * Symbol.iterator
- * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/iterator
- */
-const SymbolIterator = require('./methods/symbol.iterator');
-
-if (typeof Symbol !== 'undefined') {
-  Collection.prototype[Symbol.iterator] = SymbolIterator;
-}
-
-/**
- * Support JSON.stringify
- * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
- */
-Collection.prototype.toJSON = function toJSON() {
-  return this.items;
-};
 
 Collection.prototype.all = require('./methods/all');
 Collection.prototype.average = require('./methods/average');
